@@ -1,0 +1,56 @@
+---
+# tasks file for kibana
+- include: setup-Debian.yml
+  when: ansible_os_family == 'Debian'
+
+- name: Download Kibana.
+  get_url:
+    url: https://download.elasticsearch.org/kibana/kibana/kibana-4.0.1-linux-x64.tar.gz
+    dest: "{{ workspace }}/kibana-4.0.1-linux-x64.tar.gz"
+    validate_certs: no
+
+- name: Expand Kibana.
+  command: >
+    tar -C {{ workspace }} -xvzf {{ workspace }}/kibana-4.0.1-linux-x64.tar.gz
+- name: Ensure www directory exists.
+  file:
+    path: /var/www
+    state: directory
+
+- name: Move Kibana into place.
+  command: >
+    mv {{ workspace }}/kibana-4.0.1-linux-x64 {{ kibana_root }}
+
+- name: Copy Kibana info to default sites-available nginx configuration.
+  template:
+    src: default.j2
+    dest: /etc/nginx/sites-available/default
+    owner: root
+    group: root
+    mode: 0644
+  notify: restart nginx
+
+- name: Create Kibana user account.
+  htpasswd:
+    path: /etc/nginx/htpasswd.users
+    name: "{{ kibana_username }}"
+    password: "{{ kibana_password }}"
+    owner: root
+    group: "{{ nginx_user }}"
+    mode: 0640
+  notify: restart nginx
+
+- name: download Kibana4 startup script
+  get_url: 
+     url: https://gist.githubusercontent.com/thisismitch/8b15ac909aed214ad04a/raw/bce61d85643c2dcdfbc2728c55a41dab444dca20/kibana4
+     dest: /etc/init.d/kibana4
+     validate_certs: no
+     mode: 0755
+
+- name: Enable kibana rc.d startup script
+  command: update-rc.d kibana4 defaults 96 9
+
+- name: Change host to only allow connection from localhost
+  lineinfile: 'dest=/opt/kibana/config/kibana.yml regexp="^host: "0.0.0.0"" line="host: "localhost""'
+  notify: restart kibana 
+

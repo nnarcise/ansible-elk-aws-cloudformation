@@ -1,0 +1,12 @@
+---
+# defaults file for kibana
+workspace: /root
+
+kibana_root: /opt/kibana
+kibana_server_name: logs.example.com
+kibana_elasticsearch_port: 80
+
+kibana_username: kibanaadmin
+kibana_password: test123
+
+kibana_password_protect_all: false

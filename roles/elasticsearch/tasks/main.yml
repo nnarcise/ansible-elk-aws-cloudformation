@@ -1,0 +1,4 @@
+---
+# tasks file for elasticsearch
+- include: setup-Debian.yml
+  when: ansible_os_family == 'Debian'

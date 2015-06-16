@@ -1,0 +1,4 @@
+---
+# handlers file for logstash
+- name: restart logstash
+  service: name=logstash state=restarted

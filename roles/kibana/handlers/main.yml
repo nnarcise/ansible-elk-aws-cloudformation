@@ -1,0 +1,4 @@
+---
+# handlers file for kibana
+- name: restart kibana
+  service: name=kibana4 state=restarted

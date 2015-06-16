@@ -1,0 +1,13 @@
+---
+- name: Provision stack
+  hosts: all # This uses the hosts that we put into the in-memory hosts repository with the add_host module.
+  sudo: yes # On EC2 nodes, this is automatically passwordless.
+  remote_user: ubuntu # This is the username for all ubuntu images, rather than root, or something weird.
+  gather_facts: True  #We need to re-enable this, as we turned it off earlier.
+  roles:
+    - common
+    - java
+    - elasticsearch
+    - nginx
+    - kibana
+    - logstash
